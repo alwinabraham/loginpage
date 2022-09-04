@@ -1,40 +1,37 @@
 var express = require('express');
 var router = express.Router();
 
-var name="creator"
-var session = false;
+var name="alwin"
+var flag = 0;
 var pin="12345"
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  console.log("hello");
-  if(session){
+  if(req.session.active){
     res.redirect('/users')
-  }else
-    res.render('index')
-});
-
-router.post('/', function(req, res) {
-
-const {username,password}=req.body;
-
-if(req.session.authentication){
-  console.log("hai");
-  res.redirect('/users');
-}
-else if(name === username && pin === password){
-    req.session.authentication = true;
-    session=true;
-    res.redirect('/users')
+  }else if(flag!=0){
+    res.render('index',{error:"invalid entry"});
   }else{
-    res.render('index',{title: "invalid submission"})
+    res.render('index');
   }
 });
 
-router.get('/logout', function(req,res){
+router.post('/',(req,res)=>{
+
+  const {username,password}=req.body;
+  
+  if(name === username && pin === password ){
+    req.session.active=true;
+    res.redirect('/users');
+  }else{
+    flag++;
+    res.redirect('/');
+  }
+})
+
+router.get('/logout',(req,res)=>{
   req.session.destroy();
-  session=false;
+  flag=0;
   res.redirect('/');
-});
+})
 
 module.exports = router;
